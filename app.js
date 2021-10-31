@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const loginRoutes = require("./routes/loginRoutes");
 const teacherRoutes = require("./routes/teacherRoutes")
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 const path = require('path');
 const app = express();
 
