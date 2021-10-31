@@ -1,0 +1,29 @@
+{
+  "name": "ams-web-app",
+  "version": "1.0.0",
+  "description": "LNMIIT Academic Management System",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "heroku-postbuild": "cd client && npm install && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rahulagarwal0605/ams-web-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rahulagarwal0605/ams-web-app/issues"
+  },
+  "homepage": "https://github.com/rahulagarwal0605/ams-web-app#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jquery": "^3.6.0",
+    "mysql2": "^2.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.14"
+  }
+}
