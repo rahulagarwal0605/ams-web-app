@@ -16,3 +16,7 @@ exports.getMarks = (req, res) => {
 exports.setMarks = (req, res) => {
 
 };
+
+exports.serGrades = (req, res) => {
+
+};

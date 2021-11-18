@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const loginRoutes = require("./routes/loginRoutes");
 const teacherRoutes = require("./routes/teacherRoutes")
+const studentRoutes = require("./routes/studentRoutes")
 const PORT = process.env.PORT;
 const path = require('path');
 const app = express();
@@ -17,6 +18,8 @@ app.use(express.json());
 app.use(express.text());
 
 app.use("/api/teacher", teacherRoutes);
+
+app.use("/api/student", studentRoutes);
 
 app.use("/api", loginRoutes);
 
