@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 //jshint esversion:6
 
 const ApiError=require('../util/ApiError');
