@@ -18,7 +18,6 @@ exports.login = (req, res) => {
 				if (rows[0] !== undefined) {
 					user = {id:rows[0].LoginID, username:rows[0].UserName, type:rows[0].Type};
 					bcrypt.compare(password, rows[0].Password, function(err, result) {  // Compare
-						console.log(result);
 						// if passwords match
 						if (result) {
 							sendToken(user,res);

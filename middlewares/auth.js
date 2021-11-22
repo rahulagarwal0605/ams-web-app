@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 //jshint esversion:9
 const jwt = require('jsonwebtoken');
 
