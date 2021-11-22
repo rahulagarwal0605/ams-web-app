@@ -5,8 +5,9 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const sendToken = require('../util/jwtToken');
 const bcrypt = require('bcrypt');
+const ApiError = require('../util/ApiError');
 
-exports.login = (req, res) => {
+exports.login = (req, res,next) => {
   	var username = req.body.username;
   	var password = req.body.password;
 	var user;
@@ -25,10 +26,12 @@ exports.login = (req, res) => {
 						// if passwords do not match
 						else {
 							res.json({status: "error", data: null, message: "Invalid user details"});
+              //return next(new ApiError("Invalid user details",401));
 						}
 					  });
 				} else {
 					res.json({status: "error", data: null, message: "Invalid user details"});
+          //return next(new ApiError("Invalid user details",401));
 				}
 			} else {
 				console.log(err);

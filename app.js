@@ -28,7 +28,7 @@ app.use("/api/teacher", teacherRoutes);
 app.use("/api/student", studentRoutes);
 
 app.use("/api", loginRoutes);
-app.use(apiErrorHandler);
+//app.use(apiErrorHandler);
 
 app.get('*', (req, res) => {
 	res.sendFile(path.join(__dirname+'/client/build/index.html'));
