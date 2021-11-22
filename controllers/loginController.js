@@ -21,7 +21,6 @@ exports.login = (req, res) => {
 						// if passwords match
 						if (result) {
 							sendToken(user,res);
-							res.json({status: "success", data: user, message: "Login successful"});
 						}
 						// if passwords do not match
 						else {
