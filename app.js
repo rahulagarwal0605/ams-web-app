@@ -7,7 +7,7 @@ const loginRoutes = require("./routes/loginRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const apiErrorHandler = require("./middlewares/ErrorHandler");
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const path = require('path');
 const app = express();
 
