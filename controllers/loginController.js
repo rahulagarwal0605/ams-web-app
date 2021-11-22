@@ -18,8 +18,8 @@ exports.login = (req, res) => {
 		(err, rows) => {
 			if (!err) {
 				if (rows[0]) {
-          const user = {id:rows[0].userID, type:rows[0].userType};
-          sendToken(user,res);
+					const user = {id:rows[0].LoginID, type:rows[0].Type};
+					sendToken(user,res);
 					res.json({status: "success", data: user, message: "Login successful"});
 				} else {
 					res.json({status: "error", data: null, message: "Invalid user details"});
