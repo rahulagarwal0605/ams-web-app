@@ -87,7 +87,7 @@ exports.setGrades = (req, res) => {
 
 };
 
-exports.getEvalutaionScheme = (req, res) => {
+exports.getEvaluationScheme = (req, res) => {
     var query="SELECT Exams.ExamName, Exams.ExamDate, Exams.MaximumMarks, Exams.Weightage  FROM Exams inner join Takes on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =?";
     db.query(query,[req.params.cid],(err,results) => {
       // All Error handling will be done later
@@ -104,7 +104,7 @@ exports.getEvalutaionScheme = (req, res) => {
     );
   };
 
-exports.setEvalutionSceheme = (req, res) => {
+exports.setEvaluationSceheme = (req, res) => {
     var query="Insert into Exams(ExamName, ExamDate, MaximumMarks, Weightage) values (?, ?, ?, ?)";
     db.query(query,[cid,sid],(err,results) => {
       // All Error handling will be done later
