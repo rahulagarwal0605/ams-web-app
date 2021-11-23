@@ -4,11 +4,37 @@ require("dotenv").config();
 const db = require('../config/db');
 
 exports.viewCoursesList = (req, res) => {
-
+    var query="SELECT Course.CourseId, Course.CourseName, CourseInstructur.Session FROM Course inner join CourseInstructor on CourseInstructur.CourseId=Course.CourseId WHERE CourseInstructor.InstructorID =?";
+    db.query(query,[req.params.iid],(err,results) => {
+        // All Error handling will be done later
+        if(err){
+            console.log(err);
+        }
+        if(results!=undefined){
+            res.json({
+            status: "success",
+            data:results,
+            });
+        }
+        }
+    );
 };
 
 exports.viewStudentsList = (req, res) => {
-
+    var query="SELECT Student.RollNo, Student.Name FROM Enrolled inner join Student on Enrolled.RollNo=Student.RollNo WHERE Enrolled.CourseID =?";
+    db.query(query,[req.params.cid],(err,results) => {
+        // All Error handling will be done later
+        if(err){
+            console.log(err);
+        }
+        if(results!=undefined){
+            res.json({
+            status: "success",
+            data:results,
+            });
+        }
+        }
+    );
 };
 
 exports.getMarks = (req, res) => {
