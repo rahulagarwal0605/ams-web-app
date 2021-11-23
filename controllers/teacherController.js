@@ -5,7 +5,7 @@ const db = require('../config/db');
 
 exports.viewCoursesList = (req, res) => {
     var query="SELECT Course.CourseId, Course.CourseName, CourseInstructur.Session FROM Course inner join CourseInstructor on CourseInstructur.CourseId=Course.CourseId WHERE CourseInstructor.InstructorID =?";
-    db.query(query,[req.params.iid],(err,results) => {
+    db.query(query,[req.userId],(err,results) => {
         // All Error handling will be done later
         if(err){
             console.log(err);
@@ -40,7 +40,7 @@ exports.viewStudentsList = (req, res) => {
 exports.getMarks = (req, res) => {
   var cid=req.params.cid;
   var sid=req.params.sid;
-  let query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=?";
+  var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=?";
   db.query(query,[cid,sid],(err,results) => {
     // All Error handling will be done later
       if(err){
@@ -86,6 +86,44 @@ exports.setMarks = (req, res) => {
 exports.setGrades = (req, res) => {
 
 };
+
+exports.getEvalutaionScheme = (req, res) => {
+    var cid=req.params.cid;
+    var sid=req.params.sid;
+    var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=?";
+    db.query(query,[cid,sid],(err,results) => {
+      // All Error handling will be done later
+        if(err){
+          console.log(err);
+        }
+        if(results!=undefined){
+          res.json({
+            status: "success",
+            data:results,
+          });
+        }
+      }
+    );
+  };
+
+  exports.getEvalutaionScheme = (req, res) => {
+    var cid=req.params.cid;
+    var sid=req.params.sid;
+    var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=?";
+    db.query(query,[cid,sid],(err,results) => {
+      // All Error handling will be done later
+        if(err){
+          console.log(err);
+        }
+        if(results!=undefined){
+          res.json({
+            status: "success",
+            data:results,
+          });
+        }
+      }
+    );
+  };
 
 /*
 select*from Takes inner join Exams on
