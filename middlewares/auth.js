@@ -1,12 +1,13 @@
+//jshint esversion:9
 require("dotenv").config();
 
-//jshint esversion:9
+
 const jwt = require('jsonwebtoken');
 
 function isAuthenticated(req,res,next){
   const { token } = req.cookies;
   // if not token then send error
-  
+
   const decoded = jwt.verify(token,process.env.JWT_ACCES_TOKEN);
   req.userId=decoded.id;
   next();
@@ -14,10 +15,13 @@ function isAuthenticated(req,res,next){
 
 function authorizeRoles(roles) {
   return (req,res,next) => {
-    // check through database that if the user has that role or not
+    const { token } = req.cookies;
+    const decoded = jwt.verify(token,process.env.JWT_ACCES_TOKEN);
+    if(decoded.type!==role)
+      console.log("Not authorized");
       next();
   };
 
 }
 
-modules.exports ={isAuthenticated,authorizeRoles};
+//module.exports ={isAuthenticated,authorizeRoles};
