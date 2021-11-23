@@ -8,20 +8,22 @@ function isAuthenticated(req,res,next){
   const { token } = req.cookies;
   // if not token then send error
 
-  const decoded = jwt.verify(token,process.env.JWT_ACCES_TOKEN);
+  const decoded = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
   req.userId=decoded.id;
   next();
 }
 
-function authorizeRoles(roles) {
+function authorizeRoles(role) {
   return (req,res,next) => {
     const { token } = req.cookies;
-    const decoded = jwt.verify(token,process.env.JWT_ACCES_TOKEN);
-    if(decoded.type!==role)
-      console.log("Not authorized");
+    const decoded = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+    if(decoded.type!==role){
+      res.json({ status: "error", data: null, message: "Not Authorized"});
+    }
+    else
       next();
   };
 
 }
 
-//module.exports ={isAuthenticated,authorizeRoles};
+module.exports ={isAuthenticated,authorizeRoles};
