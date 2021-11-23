@@ -88,10 +88,8 @@ exports.setGrades = (req, res) => {
 };
 
 exports.getEvalutaionScheme = (req, res) => {
-    var cid=req.params.cid;
-    var sid=req.params.sid;
-    var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=?";
-    db.query(query,[cid,sid],(err,results) => {
+    var query="SELECT Exams.ExamName, Exams.ExamDate, Exams.MaximumMarks, Exams.Weightage  FROM Exams inner join Takes on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =?";
+    db.query(query,[req.params.cid],(err,results) => {
       // All Error handling will be done later
         if(err){
           console.log(err);
@@ -106,10 +104,8 @@ exports.getEvalutaionScheme = (req, res) => {
     );
   };
 
-  exports.getEvalutaionScheme = (req, res) => {
-    var cid=req.params.cid;
-    var sid=req.params.sid;
-    var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=?";
+exports.setEvalutionSceheme = (req, res) => {
+    var query="Insert into Exams(ExamName, ExamDate, MaximumMarks, Weightage) values (?, ?, ?, ?)";
     db.query(query,[cid,sid],(err,results) => {
       // All Error handling will be done later
         if(err){
