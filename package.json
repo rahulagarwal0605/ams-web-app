@@ -4,7 +4,9 @@
   "description": "LNMIIT Academic Management System",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+		"dev": "nodemon app.js -w",
+		"heroku-postbuild": "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
