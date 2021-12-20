@@ -1,0 +1,19 @@
+.table_area{
+    display: flex;
+}
+
+.table{
+    margin-right: 2vw;
+    margin-top: 1vh;
+    text-align: center;
+}
+
+.submit-btn{
+    border: 1px solid black;
+    border-radius: 3px;
+    margin-top: 1vh;
+    padding: 4px 8px;
+    background-color:rgb(46, 125, 50);
+    font-weight: bold;
+    color: white;
+}
