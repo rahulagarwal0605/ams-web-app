@@ -1,0 +1,15 @@
+.courseList {
+    margin: 20px;
+}
+
+.select{
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.heading{
+    color: rgb(36, 109, 3);
+    font-weight: 700;
+    text-shadow: 0 1px 1px rgb(15, 4, 58);
+    margin: 2vh 10vw;
+}

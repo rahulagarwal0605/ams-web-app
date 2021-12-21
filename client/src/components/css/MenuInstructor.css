@@ -1,0 +1,18 @@
+.menu {
+    /* background-color: aqua; */
+    margin-top: 8vh;
+    margin-left: 30vw;
+    margin-right: 30vw;
+    height: 60vh;
+    width: 40vw;
+    margin-bottom:10vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: space-between;
+
+}
+
+.links-btn{
+    width: 100%;
+}
