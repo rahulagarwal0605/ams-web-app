@@ -1,5 +1,6 @@
 //jshint esversion:8
 require("dotenv").config();
+const math = require('mathjs');
 
 const db = require('../config/db');
 
@@ -206,14 +207,105 @@ exports.deleteEvaluationSceheme = (req, res) => {
     );
 };
 
-/*
-select*from Takes inner join Exams on
-Takes.ExamID = Exams.ExamID where
-takes.CourseID = '1000' and Takes.RollNo = '19ucs001';
+exports.getGradeDetails = (req, res) => {
+  var query="Select Distinct RollNo from takes where courseID = ?";
+  db.query(query, req.params.cid, (err,results1) => {
+    // All Error handling will be done later
+    if(err){
+      console.log(err);
+    }
+    else {
+      console.log(results1);
+      let studentMarks = [];
+      for(let i=0; i<results1.length; i++) {
+        query = "select sum(MarksObtained) from takes where RollNo = ? and courseID = ?";
+        db.query(query , [results1[i].RollNo, req.params.cid], (err,results2) => {
+          if(err) {
+            console.log(err);
+          }
+          else {
+            console.log(results2);
+            query = "update into Enrolled set TotalMarks = ? where RollNo = ? and courseID = ?"
+            db.query(query, [results2[0].MarksObtained, results1[i].RollNo, req.params.cid], (err,results3) => {
+              if(err) {
+                console.log(err);
+              }
+            });
+            studentMarks.push(results2[0]);
+          }
+        });
+      }
+      let avg = math.mean(studentMarks);
+      let std = math.std(studentMarks);
+      let gradeDetails = {
+        "A" : [avg+(1.5*std), 100],
+        "AB" : [avg+std, avg+(1.5*std)],
+        "B" : [avg+(0.5*std), avg+std],
+        "BC" : [avg, avg+(0.5*std)],
+        "C" : [avg-(0.5*std), avg],
+        "CD" : [avg-std, avg-(0.5*std)],
+        "D" : [avg-(1.5*std), avg-std],
+        "F" : [0, avg-(1.5*std)]
+      }
+      res.json({
+        status: "success",
+        data: gradeDetails,
+        message:null
+      });
+    }
+  });
+}
 
-select ExamID from Takes
-where RollNo = '19ucs001' and CourseID = '1000';
-
-update Takes
-set MarksObtained = '7'
-where CourseID = '1000' and ExamID = '101' and RollNo = '19ucs001';*/
+exports.setGrades = (req, res) => {
+  var query="Select RollNo and MarksObtained from enrolled where courseID = ?";
+  db.query(query, req.params.cid, (err,results1) => {
+    // All Error handling will be done later
+    if(err){
+      console.log(err);
+    }
+    else {
+      let studentGrades = [];
+      for(let i=0; i<results1.length; i++) {
+        let grade;
+        if(results1[i].MarksObtained>=req.body.A[0] && results1[i].MarksObtained<=req.body.A[1]) {
+          grade = "A";
+        }
+        else if(results1[i].MarksObtained>=req.body.AB[0] && results1[i].MarksObtained<req.body.AB[1]) {
+          grade = "AB";
+        }
+        else if(results1[i].MarksObtained>=req.body.B[0] && results1[i].MarksObtained<req.body.B[1]) {
+          grade = "B";
+        }
+        else if(results1[i].MarksObtained>=req.body.BC[0] && results1[i].MarksObtained<req.body.BC[1]) {
+          grade = "BC";
+        }
+        else if(results1[i].MarksObtained>=req.body.C[0] && results1[i].MarksObtained<req.body.C[1]) {
+          grade = "C";
+        }
+        else if(results1[i].MarksObtained>=req.body.CD[0] && results1[i].MarksObtained<req.body.CD[1]) {
+          grade = "CD";
+        }
+        else if(results1[i].MarksObtained>=req.body.D[0] && results1[i].MarksObtained<req.body.D[1]) {
+          grade = "D";
+        }
+        else if(results1[i].MarksObtained>=req.body.F[0] && results1[i].MarksObtained<req.body.F[1]) {
+          grade = "F";
+        }
+        studentGrades.push([grade, results1[i].sid, req.params.cid]);
+      }
+      query = "update into Enrolled set Grades = ? where RollNo = ? and courseID = ?"
+      db.query(query, [studentGrades], (err,results2) => {
+        if(err) {
+          console.log(err);
+        }
+        else {
+          res.json({
+            status: "success",
+            data: null,
+            message:"Student grades updated successfully"
+          });
+        }
+      });
+    }
+  });
+}

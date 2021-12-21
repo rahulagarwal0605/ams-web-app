@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-		"dev": "nodemon app.js -w",
-		"heroku-postbuild": "cd client && npm install && npm run build"
+    "dev": "nodemon app.js -w",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "jquery": "^3.6.0",
     "jsonwebtoken": "^8.5.1",
+    "mathjs": "^10.0.0",
     "mysql2": "^2.3.2"
   }
 }
