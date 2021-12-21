@@ -15,6 +15,5 @@ router.get("/courses/:cid/students/:sid/getMarks", isAuthenticated, teacherContr
 router.post("/courses/:cid/students/:sid/setMarks", isAuthenticated, teacherController.setMarks);
 router.post("/courses/:cid/students/:sid/setGrades", isAuthenticated, teacherController.setGrades);
 router.post("/courses/:cid/SetGrades", teacherController.setGrades);
-router.post("/courses/:cid/SetOtherGrades", teacherController.setOtherGrades);
 
 module.exports = router;
