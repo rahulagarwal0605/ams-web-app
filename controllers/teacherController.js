@@ -94,7 +94,7 @@ exports.setOtherCourseGrades = (req, res) => {
       res.json({
         status: "success",
         data:results,
-        message: null
+        message: "Grade successfully updated"
       });
     }
   });
