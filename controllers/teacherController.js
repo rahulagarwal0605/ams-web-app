@@ -1,12 +1,13 @@
 //jshint esversion:8
 require("dotenv").config();
+const e = require("express");
 const math = require('mathjs');
 
 const db = require('../config/db');
 
 exports.viewCoursesList = (req, res) => {
     var query="SELECT Course.CourseId, Course.CourseName, CourseInstructor.Session FROM Course inner join CourseInstructor on CourseInstructor.CourseId=Course.CourseId WHERE CourseInstructor.InstructorID =? and CourseType = ?";
-    db.query(query,[req.query.courseType, req.userId],(err,results) => {
+    db.query(query,[req.userId, req.query.courseType],(err,results) => {
         // All Error handling will be done later
         if(err){
             console.log(err);
@@ -83,10 +84,21 @@ exports.setMarks = (req, res) => {
   });
 };
 
-// exports.setOtherCourseGrades = (req, res) => {
-//   var query = "update Enrolled set grades = ? where RollNo = ? and CourseID = ?"
-//   db.query(query,[req.body.grade, req.body.RollNo, req.])
-// };
+exports.setOtherCourseGrades = (req, res) => {
+  var query = "update Enrolled set grades = ? where RollNo = ? and CourseID = ?"
+  db.query(query,[req.body.grade, req.body.RollNo, req.params.cid], (err, results) => {
+    if(err) {
+      console.log(err);
+    }
+    else {
+      res.json({
+        status: "success",
+        data:results,
+        message: null
+      });
+    }
+  });
+};
 
 exports.getEvaluationScheme = (req, res) => {
     var query="SELECT DISTINCT Exams.ExamId, Exams.ExamName, Exams.ExamDate, Exams.TotalMarks, Exams.Weightage  FROM Exams inner join Takes on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =?";
