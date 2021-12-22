@@ -5,9 +5,8 @@ const math = require('mathjs');
 const db = require('../config/db');
 
 exports.viewCoursesList = (req, res) => {
-
-    var query="SELECT Course.CourseId, Course.CourseName, CourseInstructor.Session FROM Course inner join CourseInstructor on CourseInstructor.CourseId=Course.CourseId WHERE CourseInstructor.InstructorID =?";
-    db.query(query,[req.userId],(err,results) => {
+    var query="SELECT Course.CourseId, Course.CourseName, CourseInstructor.Session FROM Course inner join CourseInstructor on CourseInstructor.CourseId=Course.CourseId WHERE CourseInstructor.InstructorID =? and CourseType = ?";
+    db.query(query,[req.query.courseType, req.userId],(err,results) => {
         // All Error handling will be done later
         if(err){
             console.log(err);
@@ -84,9 +83,10 @@ exports.setMarks = (req, res) => {
   });
 };
 
-exports.setGrades = (req, res) => {
-
-};
+// exports.setOtherCourseGrades = (req, res) => {
+//   var query = "update Enrolled set grades = ? where RollNo = ? and CourseID = ?"
+//   db.query(query,[req.body.grade, req.body.RollNo, req.])
+// };
 
 exports.getEvaluationScheme = (req, res) => {
     var query="SELECT DISTINCT Exams.ExamId, Exams.ExamName, Exams.ExamDate, Exams.TotalMarks, Exams.Weightage  FROM Exams inner join Takes on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =?";
@@ -167,7 +167,7 @@ exports.setEvaluationSceheme = (req, res) => {
 };
 
 exports.editEvaluationSceheme = (req, res) => {
-  var query="update into Exams set ExamName = ?, TotalMarks = ?, Weightage = ? WHERE ExamId =?";
+  var query="update Exams set ExamName = ?, TotalMarks = ?, Weightage = ? WHERE ExamId =?";
     db.query(query,[req.body.ExamName, req.body.MaximumMarks, req.body.Weightage, req.body.ExamID],(err,results) => {
         // All Error handling will be done later
         if(err){
@@ -307,7 +307,7 @@ exports.setGrades = (req, res) => {
         }
         studentGrades.push([grade, results1[i].sid, req.params.cid]);
       }
-      query = "update into Enrolled set Grades = ? where RollNo = ? and courseID = ?"
+      query = "update Enrolled set Grades = ? where RollNo = ? and courseID = ?"
       db.query(query, [studentGrades], (err,results2) => {
         if(err) {
           console.log(err);
