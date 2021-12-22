@@ -5,7 +5,8 @@ const math = require('mathjs');
 const db = require('../config/db');
 
 exports.viewCoursesList = (req, res) => {
-    var query="SELECT Course.CourseId, Course.CourseName, CourseInstructur.Session FROM Course inner join CourseInstructor on CourseInstructur.CourseId=Course.CourseId WHERE CourseInstructor.InstructorID =?";
+
+    var query="SELECT Course.CourseId, Course.CourseName, CourseInstructor.Session FROM Course inner join CourseInstructor on CourseInstructor.CourseId=Course.CourseId WHERE CourseInstructor.InstructorID =?";
     db.query(query,[req.userId],(err,results) => {
         // All Error handling will be done later
         if(err){
@@ -84,7 +85,7 @@ exports.setMarks = (req, res) => {
 };
 
 exports.setGrades = (req, res) => {
-  
+
 };
 
 exports.getEvaluationScheme = (req, res) => {
@@ -218,41 +219,54 @@ exports.getGradeDetails = (req, res) => {
       console.log(results1);
       let studentMarks = [];
       for(let i=0; i<results1.length; i++) {
-        query = "select sum(MarksObtained) from takes where RollNo = ? and courseID = ?";
+        query = "select sum(MarksObtained) as MarksObtained from takes where RollNo = ? and CourseID = ?";
         db.query(query , [results1[i].RollNo, req.params.cid], (err,results2) => {
           if(err) {
             console.log(err);
           }
           else {
             console.log(results2);
-            query = "update into Enrolled set TotalMarks = ? where RollNo = ? and courseID = ?"
+            query = "update Enrolled set totalMarks = ? where RollNo = ? and CourseID = ?"
             db.query(query, [results2[0].MarksObtained, results1[i].RollNo, req.params.cid], (err,results3) => {
               if(err) {
                 console.log(err);
               }
+              else{
+                studentMarks.push(results2[0].MarksObtained);
+                if(i==results1.length-1)
+                  returnGradeDetails(res,studentMarks);
+              }
             });
-            studentMarks.push(results2[0]);
           }
         });
       }
-      let avg = math.mean(studentMarks);
-      let std = math.std(studentMarks);
-      let gradeDetails = {
-        "A" : [avg+(1.5*std), 100],
-        "AB" : [avg+std, avg+(1.5*std)],
-        "B" : [avg+(0.5*std), avg+std],
-        "BC" : [avg, avg+(0.5*std)],
-        "C" : [avg-(0.5*std), avg],
-        "CD" : [avg-std, avg-(0.5*std)],
-        "D" : [avg-(1.5*std), avg-std],
-        "F" : [0, avg-(1.5*std)]
-      }
-      res.json({
-        status: "success",
-        data: gradeDetails,
-        message:null
-      });
+
     }
+  });
+}
+
+
+function returnGradeDetails(res,studentMarks){
+  let avg = math.mean(studentMarks);
+
+  let std = math.std(studentMarks);
+  console.log(avg, std, studentMarks);
+
+  let gradeDetails = {
+
+    "A" : [Math.min(avg+(1.5*std),100), 100],
+    "AB" : [Math.min(avg+std,100), Math.min(avg+(1.5*std),100)],
+    "B" : [Math.min(avg+(0.5*std),100), Math.min(avg+std,100)],
+    "BC" : [avg, Math.min(avg+(0.5*std),100)],
+    "C" : [Math.max(avg-(0.5*std),0), avg],
+    "CD" : [Math.max(avg-std,0), Math.max(avg-(0.5*std),0)],
+    "D" : [Math.max(avg-(1.5*std),0),Math.max( avg-std,0)],
+    "F" : [0, Math.max(avg-(1.5*std),0)]
+  }
+  res.json({
+    status: "success",
+    data: gradeDetails,
+    message:null
   });
 }
 

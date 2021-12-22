@@ -4,8 +4,8 @@ const router = express.Router();
 const teacherController = require("../controllers/teacherController");
 const {isAuthenticated,authorizeRoles}= require("../middlewares/auth");
 
-router.get("/courses", isAuthenticated, teacherController.viewCoursesList);
-router.get("/courses/:cid/students", isAuthenticated, teacherController.viewStudentsList);
+router.get("/courses",isAuthenticated, teacherController.viewCoursesList);
+router.get("/courses/:cid/students",isAuthenticated, teacherController.viewStudentsList);
 router.get("/courses/:cid/EvalutaionScheme", isAuthenticated, teacherController.getEvaluationScheme);
 router.get("/courses/:cid/GetGradeDetails", isAuthenticated, teacherController.getGradeDetails);
 router.delete("/courses/:cid/EvalutaionScheme", isAuthenticated, teacherController.deleteEvaluationSceheme);
