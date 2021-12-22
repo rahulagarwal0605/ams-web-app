@@ -1,6 +1,7 @@
 // jshint esversion:9
 
 const express = require("express");
+const cors = require('cors')
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 const loginRoutes = require("./routes/loginRoutes");
@@ -11,7 +12,10 @@ const PORT = process.env.PORT || 3000;
 const path = require('path');
 const app = express();
 
+
 dotenv.config({ path: "./.env" });
+
+app.use(cors())
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 
