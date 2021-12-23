@@ -285,7 +285,7 @@ function returnGradeDetails(res,studentMarks){
 }
 
 exports.setGrades = (req, res) => {
-  var query="Select RollNo and MarksObtained from enrolled where courseID = ?";
+  var query="Select RollNo and TotalMarks from enrolled where courseID = ?";
   db.query(query, req.params.cid, (err,results1) => {
     // All Error handling will be done later
     if(err){
