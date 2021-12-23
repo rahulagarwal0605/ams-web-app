@@ -183,8 +183,12 @@ exports.editEvaluationSceheme = (req, res) => {
         if(err){
             console.log(err);
         }
-        if(results!=undefined){
-          callback(examId, cid, res, results);
+        else {
+          res.json({
+            status: "success",
+            data:null,
+            message:"Exam component edited successfully"
+          });
         }
       }
     );
