@@ -15,7 +15,10 @@ const app = express();
 
 dotenv.config({ path: "./.env" });
 
-app.use(cors())
+app.use(cors({
+   credentials : true,
+   origin: ['http://localhost:3006', 'https://gradingsystem.netlify.app']
+}));
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 
