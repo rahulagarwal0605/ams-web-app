@@ -117,8 +117,6 @@ exports.getEvaluationScheme = (req, res) => {
     );
   };
 
-
-
 function setExam(ExamName, MaximumMarks, Weightage, cid, res, callback) {
   var query="Insert into Exams(ExamName, TotalMarks, Weightage) values (?, ?, ?); Select ExamId from Exams order by ExamId desc limit 1";
     db.query(query,[ExamName, MaximumMarks, Weightage],(err,results) => {
