@@ -285,7 +285,7 @@ function returnGradeDetails(res,studentMarks){
 }
 
 exports.setGrades = (req, res) => {
-  var query="Select RollNo and TotalMarks from enrolled where courseID = ?";
+  var query="Select RollNo and TotalMarks as MarksObtained from enrolled where courseID = ?";
   db.query(query, req.params.cid, (err,results1) => {
     // All Error handling will be done later
     if(err){
@@ -322,7 +322,7 @@ exports.setGrades = (req, res) => {
         studentGrades.push([grade, results1[i].sid, req.params.cid]);
       }
       query = "update Enrolled set Grades = ? where RollNo = ? and courseID = ?"
-      db.query(query, [studentGrades], (err,results2) => {
+      db.query(query, [studentGrades, results1[i].sid, req.params.cid], (err,results2) => {
         if(err) {
           console.log(err);
         }
