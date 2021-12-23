@@ -294,7 +294,7 @@ exports.getGrades = (req, res) => {
       res.json({
         status: "success",
         data: results[0].grades,
-        message:"Student grades updated successfully"
+        message: null
       })
     }
   });
