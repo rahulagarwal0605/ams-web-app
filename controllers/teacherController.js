@@ -86,14 +86,14 @@ exports.setMarks = (req, res) => {
 
 exports.setOtherCourseGrades = (req, res) => {
   var query = "update Enrolled set grades = ? where RollNo = ? and CourseID = ?"
-  db.query(query,[req.body.grade, req.body.RollNo, req.params.cid], (err, results) => {
+  db.query(query,[req.body.grade, req.params.sid, req.params.cid], (err, results) => {
     if(err) {
       console.log(err);
     }
     else {
       res.json({
         status: "success",
-        data:results,
+        data: null,
         message: "Grade successfully updated"
       });
     }
@@ -284,56 +284,71 @@ function returnGradeDetails(res,studentMarks){
   });
 }
 
+exports.getGrades = (req, res) => {
+  var query = "Select grades from enrolled where courseId = ? and RollNo = ?";
+  db.query(query, [req.params.cid, req.params.sid], (err, results) => {
+    if(err) {
+      console.log(err);
+    }
+    else {
+      res.json({
+        status: "success",
+        data: results[0].grades,
+        message:"Student grades updated successfully"
+      })
+    }
+  });
+}
+
 exports.setGrades = (req, res) => {
-  var query="Select RollNo and TotalMarks as MarksObtained from enrolled where courseID = ?";
+  var query="Select RollNo, TotalMarks from enrolled where courseID = ?";
   db.query(query, req.params.cid, (err,results1) => {
     // All Error handling will be done later
     if(err){
       console.log(err);
     }
     else {
-      let studentGrades = [];
-      for(let i=0; i<results1.length; i++) {
+      let i;
+      for(i=0; i<results1.length; i++) {
         let grade;
-        if(results1[i].MarksObtained>=req.body.A[0] && results1[i].MarksObtained<=req.body.A[1]) {
+        if(results1[i].TotalMarks>=req.body.A[0] && results1[i].TotalMarks<=req.body.A[1]) {
           grade = "A";
         }
-        else if(results1[i].MarksObtained>=req.body.AB[0] && results1[i].MarksObtained<req.body.AB[1]) {
+        else if(results1[i].TotalMarks>=req.body.AB[0] && results1[i].TotalMarks<req.body.AB[1]) {
           grade = "AB";
         }
-        else if(results1[i].MarksObtained>=req.body.B[0] && results1[i].MarksObtained<req.body.B[1]) {
+        else if(results1[i].TotalMarks>=req.body.B[0] && results1[i].TotalMarks<req.body.B[1]) {
           grade = "B";
         }
-        else if(results1[i].MarksObtained>=req.body.BC[0] && results1[i].MarksObtained<req.body.BC[1]) {
+        else if(results1[i].TotalMarks>=req.body.BC[0] && results1[i].TotalMarks<req.body.BC[1]) {
           grade = "BC";
         }
-        else if(results1[i].MarksObtained>=req.body.C[0] && results1[i].MarksObtained<req.body.C[1]) {
+        else if(results1[i].TotalMarks>=req.body.C[0] && results1[i].TotalMarks<req.body.C[1]) {
           grade = "C";
         }
-        else if(results1[i].MarksObtained>=req.body.CD[0] && results1[i].MarksObtained<req.body.CD[1]) {
+        else if(results1[i].TotalMarks>=req.body.CD[0] && results1[i].TotalMarks<req.body.CD[1]) {
           grade = "CD";
         }
-        else if(results1[i].MarksObtained>=req.body.D[0] && results1[i].MarksObtained<req.body.D[1]) {
+        else if(results1[i].TotalMarks>=req.body.D[0] && results1[i].TotalMarks<req.body.D[1]) {
           grade = "D";
         }
-        else if(results1[i].MarksObtained>=req.body.F[0] && results1[i].MarksObtained<req.body.F[1]) {
+        else if(results1[i].TotalMarks>=req.body.F[0] && results1[i].TotalMarks<req.body.F[1]) {
           grade = "F";
         }
-        studentGrades.push([grade, results1[i].sid, req.params.cid]);
-      }
-      query = "update Enrolled set Grades = ? where RollNo = ? and courseID = ?"
-      db.query(query, [studentGrades, results1[i].sid, req.params.cid], (err,results2) => {
-        if(err) {
-          console.log(err);
-        }
-        else {
+        query = "update Enrolled set Grades = ? where RollNo = ? and courseID = ?"
+        db.query(query, [grade, results1[i].RollNo, req.params.cid], (err,results2) => {
+          if(err) {
+            console.log(err);
+          }
+        });
+        if(i==results1.length-1) {
           res.json({
             status: "success",
             data: null,
             message:"Student grades updated successfully"
           });
         }
-      });
+      }
     }
   });
 }

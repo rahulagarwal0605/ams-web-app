@@ -13,8 +13,8 @@ router.post("/courses/:cid/EvalutaionScheme", isAuthenticated, teacherController
 router.put("/courses/:cid/EvalutaionScheme", isAuthenticated, teacherController.editEvaluationSceheme);
 router.get("/courses/:cid/students/:sid/getMarks", isAuthenticated, teacherController.getMarks);
 router.post("/courses/:cid/students/:sid/setMarks", isAuthenticated, teacherController.setMarks);
-router.post("/courses/:cid/students/:sid/setGrades", isAuthenticated, teacherController.setGrades);
+router.get("/courses/:cid/students/:sid/getGrades", isAuthenticated, teacherController.getGrades);
 router.post("/courses/:cid/SetGrades", teacherController.setGrades);
-router.post("/courses/:cid/SetOtherCourseGrades", teacherController.setOtherCourseGrades);
+router.post("/courses/:cid/SetOtherCourseGrades/:sid", teacherController.setOtherCourseGrades);
 
 module.exports = router;
