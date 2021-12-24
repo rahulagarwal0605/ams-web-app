@@ -10,39 +10,68 @@ import Paper from '@mui/material/Paper';
 import Button from "@mui/material/Button";
 import Header from "./Header.js";
 import Footer from "./Footer.js";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
+import authContext from "../context/userContext";
+import { Alert } from 'antd';
 
 function CourseList({ list, page }) {
 
-    const [course, setCourse] = useState([]);
+    const [courses, setCourses] = useState([]);
+    const [data, setData] = useState([]);
+    const [sessions, setSessions] = useState([]);
+    const [session, setSession] = useState();
+
+    const { authenticated } = React.useContext(authContext);
+    const history = useNavigate();
 
     //make a api call and get course list of loggedin teacher
     useEffect(() => {
-        // async function fetchData() {
-        //     try {
-        //         const response = await fetch(
-        //             ""
-        //         );
-        //         const json = await response.json();
-        //         setCourse(json.data.children.map(it => it.data));
-        //     } catch (e) {
-        //         console.error(e);
-        //     }
-        // };
-        // fetchData();
-    }, []);
+
+        if (!authenticated) history("/");
+        window.scrollTo(0, 0)
+        const makeCall = async () => {
+            const options = {
+                url: 'http://localhost:3000/api/teacher/courses?courseType=NC',
+                method: 'GET',
+                withCredentials: true,
+            }
+            const resp = await axios(options);
+            let unique_s = [];
+            setData(resp.data.data);
+            resp.data.data.forEach((obj) => {
+                if (!unique_s.includes(obj.Session)) unique_s.push(obj.Session);
+            });
+            setSessions(unique_s);
+            console.log(resp.data);
+        }
+        makeCall();
+    }, [authenticated, history]);
+
+    const findCourses = (e) => {
+        setSession(e);
+        let courses_ = [];
+        data.forEach((d) => {
+            if (d.Session === e) {
+                courses_.push(d);
+            }
+        })
+        setCourses(courses_);
+    }
 
     return (
         <div>
             <Header />
             <div className="courseList">
+                <Alert message="Upon selecting a Session, the Course List of the selected session will appear. " type="info" showIcon />
                 <h4 className="heading">{list === "EvaluationScheme" ? "Set" : "Mark Entry - "} {list}</h4>
                 <div className="main">
                     <div className="select">
                         <label htmlFor="session">Session:&nbsp;&nbsp;</label>
-                        <select name="session" id="session">
-                            <option value="Odd Sem 2020-2021 I">Odd Sem 2020-2021 I</option>
-                            <option value="Even Sem 2020-2021 II">Even Sem 2020-2021 II</option>
+                        <select name="session" id="session" onChange={(e) => findCourses(e.target.value)}>
+                            {sessions.map((s) => (
+                                <option value={s}>{s}</option>
+                            ))}
                         </select>
                     </div>
 
@@ -58,13 +87,13 @@ function CourseList({ list, page }) {
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        course.map((c) => (
+                                        courses.map((c) => (
                                             <TableRow
                                                 key={c}
                                             >
-                                                <TableCell>{c.CID}&nbsp;</TableCell>
-                                                <TableCell>{c.Name}</TableCell>
-                                                <TableCell><Button variant='contained'><Link style={{ textDecoration: "none ", color: "white" }} to={`/MenuInstructor/CourseList${list}/${page}`}>Select</Link></Button></TableCell>
+                                                <TableCell>{c.CourseId}&nbsp;</TableCell>
+                                                <TableCell>{c.CourseName}</TableCell>
+                                                <TableCell><Button variant='contained'><Link style={{ textDecoration: "none ", color: "white" }} to={`/MenuInstructor/CourseList${list}/${page}?session=${session}&course=${c.CourseName}&id=${c.CourseId}`}>Select</Link></Button></TableCell>
                                             </TableRow>
                                         ))
                                     }

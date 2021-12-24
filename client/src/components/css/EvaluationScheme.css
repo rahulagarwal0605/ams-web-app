@@ -22,3 +22,6 @@
     display: flex;
     justify-content: center;
 }
+input::-webkit-input-placeholder {
+    color: black;
+  }

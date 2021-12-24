@@ -1,1 +1,2 @@
-export const URL = "https://localhost:3000";
+const url = "https://ams-web-app.herokuapp.com";
+export default url;

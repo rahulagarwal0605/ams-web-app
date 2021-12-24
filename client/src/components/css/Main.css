@@ -111,7 +111,8 @@ label {
     right: 0px;
 }
 
-.login-btm {
+.login-btmm {
+    width: 80%;
     float: left;
 }
 
@@ -121,12 +122,25 @@ label {
     margin-bottom: 25px;
 }
 
+/* .loginbttm{
+    displ
+} */
+
 .login-text {
     text-align: left;
     padding-left: 0px;
     color: #0DB8DE;
 }
 
-.loginbttm {
-    padding: 0px;
+/* .loginbttm {
+    border: 1px solid #1A2226;
+    padding: 5px 5px;
+    font-weight: bold;
+    background-color: #0DB8DE;
+} */
+
+.login-btm{
+    width: 10%;
+    float: right;
+    margin-bottom: 10px;
 }

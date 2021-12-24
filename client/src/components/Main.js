@@ -1,37 +1,45 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import './css/Main.css';
-import userContext from "../context/userContext";
 import { useNavigate } from "react-router-dom";
+import authContext from "../context/userContext";
+import { Button, message } from 'antd';
+import 'antd/dist/antd.css';
+import url from './constants.js';
 
 function Main() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const { teacherId, setTeacherId } = React.useContext(userContext);
+
     let history = useNavigate();
 
-    //make a api call and redirect to menuInstructor
+    const { setAuthenticated } = React.useContext(authContext);
+
     const login = async () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "username": "rahulagarwal",
-                "password": "rahulagarwal"
-            })
-        };
         if (verifyDetails()) {
-            try {
-                const resp = await fetch('https://ams-web-app.herokuapp.com/api/login', requestOptions);
-                const data = await resp.json();
-                console.log(data);
-                alert("rahul")
-                history('/menuInstructor');
+            const options = {
+                url: `${url}/api/login`,
+                method: 'POST',
+                withCredentials: true,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    username: username,
+                    password: password
+                }
             }
-            catch (err) {
-                console.log(err);
+
+            const resp = await axios(options);
+            if (resp.data.status === 'success') {
+                setAuthenticated(true);
+                if (resp.data.data.type === 'Instructor') history("/successlogin");
             }
+            else message.error("Wrong Username/password or both");
         }
     }
+
 
     const verifyDetails = () => {
         if (!username || !password) {
@@ -41,13 +49,9 @@ function Main() {
         else return 1;
     }
 
-
-
-
-
     return (
         <div>
-            <div className="outer"></div>
+            <div className="outer" ></div>
             <div className="main__login">
                 <div className="container">
                     <div className="row">
@@ -70,11 +74,11 @@ function Main() {
                                         </div>
 
                                         <div className="col-lg-12 loginbttm">
-                                            <div className="col-lg-6 login-btm login-text">
+                                            <div className="col-lg-6 login-btmm login-text">
                                                 Forget Password ?
                                             </div>
-                                            <div className="col-lg-6 login-btm login-button">
-                                                <button onClick={login} style={{ border: '1px solid #1A2226', padding: '5px 5px', fontWeight: "bold", backgroundColor: '#0DB8DE' }}>Login</button>
+                                            <div className="col-lg-6 login-btm ">
+                                                <Button onClick={login} style={{ color: 'black', border: '1px solid #1A2226', padding: '5px 5px', fontWeight: "bold", backgroundColor: '#0DB8DE' }}>Login</Button>
                                             </div>
                                         </div>
                                     </form>

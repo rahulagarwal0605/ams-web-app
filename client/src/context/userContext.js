@@ -1,8 +1,8 @@
-import React from 'react';
+import { createContext } from "react";
 
-const userContext = React.createContext({
-    teacherId: '',
-    setTeacherId: (id) => { },
+const authContext = createContext({
+    authenticated: false,
+    setAuthenticated: (auth) => { }
 });
 
-export default userContext;
+export default authContext;
