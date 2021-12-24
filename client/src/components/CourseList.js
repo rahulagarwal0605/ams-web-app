@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import authContext from "../context/userContext";
 import { Alert } from 'antd';
+import url from './constants.js';
 
 function CourseList({ list, page }) {
 
@@ -32,7 +33,7 @@ function CourseList({ list, page }) {
         window.scrollTo(0, 0)
         const makeCall = async () => {
             const options = {
-                url: 'http://localhost:3000/api/teacher/courses?courseType=NC',
+                url: `${url}/api/teacher/courses?courseType=NC`,
                 method: 'GET',
                 withCredentials: true,
             }
