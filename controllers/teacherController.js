@@ -366,7 +366,7 @@ exports.getGradeDetails = (req, res) => {
             console.log(err);
           }
           else {
-            console.log(results2);
+            // console.log(results2);
             query = "update Enrolled set totalMarks = ? where RollNo = ? and CourseID = ?"
             db.query(query, [results2[0].MarksObtained, results1[i].RollNo, req.params.cid], (err,results3) => {
               if(err) {
@@ -392,7 +392,7 @@ function returnGradeDetails(res,studentMarks){
   let avg = math.mean(studentMarks);
 
   let std = math.std(studentMarks);
-  console.log(avg, std, studentMarks);
+  // console.log(avg, std, studentMarks);
 
   let gradeDetails = {
 
