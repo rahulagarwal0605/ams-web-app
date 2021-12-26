@@ -356,8 +356,9 @@ exports.getGradeDetails = (req, res) => {
       console.log(err);
     }
     else {
-      console.log(results1);
+      // console.log(results1);
       let studentMarks = [];
+      let counter = 0;
       for(let i=0; i<results1.length; i++) {
         query = "select sum(MarksObtained) as MarksObtained from takes where RollNo = ? and CourseID = ?";
         db.query(query , [results1[i].RollNo, req.params.cid], (err,results2) => {
@@ -373,7 +374,8 @@ exports.getGradeDetails = (req, res) => {
               }
               else{
                 studentMarks.push(results2[0].MarksObtained);
-                if(i==results1.length-1)
+                counter++;
+                if(counter==results1.length)
                   returnGradeDetails(res,studentMarks);
               }
             });
@@ -435,28 +437,28 @@ exports.getTotalStudents = (req, res) => {
     }
     else {
       for(let i=0; i<results.length; i++) {
-        if(results[i].TotalMarks>=req.query.Amin&& results[i].TotalMarks<=req.query.Amax) {
+        if(results[i].TotalMarks>=req.body.A[0]&& results[i].TotalMarks<=req.body.A[1]) {
           totalStudents[0]++;
         }
-        else if(results[i].TotalMarks>=req.query.ABmin&& results[i].TotalMarks<req.query.ABmax) {
+        else if(results[i].TotalMarks>=req.body.AB[0]&& results[i].TotalMarks<req.body.AB[1]) {
           totalStudents[1]++;
         }
-        else if(results[i].TotalMarks>=req.query.Bmin&& results[i].TotalMarks<req.query.Bmax) {
+        else if(results[i].TotalMarks>=req.body.B[0]&& results[i].TotalMarks<req.body.B[1]) {
           totalStudents[2]++;
         }
-        else if(results[i].TotalMarks>=req.query.BCmin&& results[i].TotalMarks<req.query.BCmax) {
+        else if(results[i].TotalMarks>=req.body.BC[0]&& results[i].TotalMarks<req.body.BC[1]) {
           totalStudents[3]++;
         }
-        else if(results[i].TotalMarks>=req.query.Cmin&& results[i].TotalMarks<req.query.Cmax) {
+        else if(results[i].TotalMarks>=req.body.C[0]&& results[i].TotalMarks<req.body.C[1]) {
           totalStudents[4]++;
         }
-        else if(results[i].TotalMarks>=req.query.CDmin&& results[i].TotalMarks<req.query.CDmax) {
+        else if(results[i].TotalMarks>=req.body.CD[0]&& results[i].TotalMarks<req.body.CD[1]) {
           totalStudents[5]++;
         }
-        else if(results[i].TotalMarks>=req.query.Dmin&& results[i].TotalMarks<req.query.Dmax) {
+        else if(results[i].TotalMarks>=req.body.D[0]&& results[i].TotalMarks<req.body.D[1]) {
           totalStudents[6]++;
         }
-        else if(results[i].TotalMarks>=req.query.Fmin&& results[i].TotalMarks<req.query.Fmax) {
+        else if(results[i].TotalMarks>=req.body.F[0]&& results[i].TotalMarks<req.body.F[1]) {
           totalStudents[7]++;
         }
       }
@@ -477,8 +479,8 @@ exports.setGrades = (req, res) => {
       console.log(err);
     }
     else {
-      let i;
-      for(i=0; i<results1.length; i++) {
+      let counter = 0;
+      for(let i=0; i<results1.length; i++) {
         let grade;
         if(results1[i].TotalMarks>=req.body.A[0] && results1[i].TotalMarks<=req.body.A[1]) {
           grade = "A";
@@ -510,7 +512,8 @@ exports.setGrades = (req, res) => {
             console.log(err);
           }
         });
-        if(i==results1.length-1) {
+        counter++;
+        if(counter==results1.length) {
           res.json({
             status: "success",
             data: null,
