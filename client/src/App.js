@@ -26,7 +26,8 @@ function App() {
           <Route path="/MenuInstructor/CourseListEvaluationScheme/EvaluationScheme" element={<EvaluationScheme />} />
           <Route path="/MenuInstructor/CourseListInternal/MarkEntryInternal" element={<MarkEntryInternal />} />
           <Route path="/MenuInstructor/CourseListEndterm/MarkEntryEndterm" element={<MarkEntryEndterm />} />
-          <Route path="/MenuInstructor/Btp" element={<Btp />} />
+          <Route path="/MenuInstructor/CourseListBtp" element={<CourseList page="BTP" list="BTP" />} />
+          <Route path="/MenuInstructor/CourseListBtp/Btp" element={<Btp />} />
 
         </Routes>
 

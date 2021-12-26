@@ -28,12 +28,12 @@ function CourseList({ list, page }) {
 
     //make a api call and get course list of loggedin teacher
     useEffect(() => {
-
+        const courseType = list === 'BTP' ? 'BTP' : 'NC';
         if (!authenticated) history("/");
         window.scrollTo(0, 0)
         const makeCall = async () => {
             const options = {
-                url: `${url}/api/teacher/courses?courseType=NC`,
+                url: `${url}/api/teacher/courses?courseType=${courseType}`,
                 method: 'GET',
                 withCredentials: true,
             }
@@ -47,9 +47,10 @@ function CourseList({ list, page }) {
             console.log(resp.data);
         }
         makeCall();
-    }, [authenticated, history]);
+    }, [authenticated, history, list]);
 
     const findCourses = (e) => {
+        if (e === 'None') return;
         setSession(e);
         let courses_ = [];
         data.forEach((d) => {
@@ -70,6 +71,7 @@ function CourseList({ list, page }) {
                     <div className="select">
                         <label htmlFor="session">Session:&nbsp;&nbsp;</label>
                         <select name="session" id="session" onChange={(e) => findCourses(e.target.value)}>
+                            <option value="None">Select Session</option>
                             {sessions.map((s) => (
                                 <option value={s}>{s}</option>
                             ))}
@@ -81,8 +83,8 @@ function CourseList({ list, page }) {
                             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Course ID&nbsp;</TableCell>
-                                        <TableCell>Course Name&nbsp;</TableCell>
+                                        <TableCell>{list === 'BTP' ? 'Project' : 'Course'} ID&nbsp;</TableCell>
+                                        <TableCell>{list === 'BTP' ? 'Project' : 'Course'} Name&nbsp;</TableCell>
                                         <TableCell>&nbsp;&nbsp;&nbsp;Action</TableCell>
                                     </TableRow>
                                 </TableHead>
