@@ -12,6 +12,9 @@ router.delete("/courses/:cid/EvalutaionScheme", isAuthenticated, teacherControll
 router.post("/courses/:cid/EvalutaionScheme", isAuthenticated, teacherController.setEvaluationSceheme);
 router.put("/courses/:cid/EvalutaionScheme", isAuthenticated, teacherController.editEvaluationSceheme);
 router.get("/courses/:cid/students/:sid/getMarks", isAuthenticated, teacherController.getMarks);
+router.get("/courses/:cid/setLock", isAuthenticated, teacherController.setLock);
+router.get("/courses/:cid/getLock", isAuthenticated, teacherController.getLock);
+router.get("/courses/:cid/getTotalStudents", isAuthenticated, teacherController.getTotalStudents);
 router.post("/courses/:cid/students/:sid/setMarks", isAuthenticated, teacherController.setMarks);
 router.get("/courses/:cid/students/:sid/getGrades", isAuthenticated, teacherController.getGrades);
 router.post("/courses/:cid/SetGrades", teacherController.setGrades);

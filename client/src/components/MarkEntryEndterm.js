@@ -74,7 +74,7 @@ function MarkEntryEndterm() {
 
         const getMarksandGrades = async (s) => {
             let options = {
-                url: `${url}/api/teacher/courses/${id}/students/${s.RollNo}/getMarks`,
+                url: `${url}/api/teacher/courses/${id}/students/${s.RollNo}/getMarks?examType=endterm`,
                 method: 'GET',
                 withCredentials: true,
             }

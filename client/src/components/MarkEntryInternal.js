@@ -38,7 +38,7 @@ function MarkEntryInternal() {
 
         const getMarks = async (s) => {
             let options = {
-                url: `${url}/api/teacher/courses/${id}/students/${s.RollNo}/getMarks`,
+                url: `${url}/api/teacher/courses/${id}/students/${s.RollNo}/getMarks?examType=internals`,
                 method: 'GET',
                 withCredentials: true,
             }
@@ -95,7 +95,7 @@ function MarkEntryInternal() {
         }
 
         const options = {
-            url: `${url}/api/teacher/courses/${id}/students/${roll}/setMarks`,
+            url: `${url}/api/teacher/courses/${id}/students/${roll}/setMarks?examType=internals`,
             method: 'POST',
             withCredentials: true,
             data: {

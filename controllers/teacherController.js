@@ -42,8 +42,8 @@ exports.viewStudentsList = (req, res) => {
 exports.getMarks = (req, res) => {
   var cid=req.params.cid;
   var sid=req.params.sid;
-  if(req.query=="internals") {
-    var query="SELECT Takes.MarksObtained, Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=? and Exams.ExamName != 'End Term'";
+  if(req.query.examType=="internals") {
+    var query="SELECT Takes.MarksObtained, Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=? and Exams.ExamName != 'Endterm'";
     db.query(query,[cid,sid],(err,results) => {
       // All Error handling will be done later
         if(err){
@@ -58,8 +58,8 @@ exports.getMarks = (req, res) => {
       }
     );
   }
-  else if(req.query=="endterm") {
-    var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=? and Exams.ExamName = 'End Term'";
+  else if(req.query.examType=="endterm") {
+    var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=? and Exams.ExamName = 'Endterm'";
     db.query(query,[cid,sid],(err,results) => {
       // All Error handling will be done later
         if(err){
@@ -80,27 +80,135 @@ exports.setMarks = (req, res) => {
   var cid=req.params.cid;
   var sid=req.params.sid;
   var marks=req.body.marks;
-  var query1 = "Select ExamID from Takes WHERE CourseID=? and RollNo=?";
-  db.query(query1,[cid,sid],(err,result)=>{
-    // All error handling will be done later
-    if(err)
-      console.log(err);
-    if(result!=undefined){
-      result.forEach((obj,index) => {
-        var query2="Update Takes set MarksObtained=? where CourseID=? and RollNo=? and ExamID=?";
-        db.query(query2,[marks[index],cid,sid,obj.ExamID],(err,result)=>{
-          // All Error handling will be done later
-          if(err)
-            console.log(err);
+  if(req.query.examType=="internals") {
+    var query1 = "Select Exams.ExamID, Exams.ExamName from Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID=? and Takes.RollNo=? and ExamName!='Endterm'";
+    db.query(query1,[cid,sid],(err,result)=>{
+      // All error handling will be done later
+      if(err)
+        console.log(err);
+      if(result!=undefined){
+        result.forEach((obj,index) => {
+          var query2="Update Takes set MarksObtained=? where CourseID=? and RollNo=? and ExamID=?";
+          db.query(query2,[marks[index],cid,sid,obj.ExamID],(err,result)=>{
+            // All Error handling will be done later
+            if(err)
+              console.log(err);
+          });
         });
-      });
-      res.json({
-        status: "success",
-        message:"marks sucessfully updated"
-      });
-    }
-  });
+        res.json({
+          status: "success",
+          message:"marks sucessfully updated"
+        });
+      }
+    });
+  }
+  if(req.query.examType=="endterm") {
+    var query1 = "Select Exams.ExamID, Exams.ExamName from Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID=? and Takes.RollNo=? and ExamName='Endterm'";
+    db.query(query1,[cid,sid],(err,result)=>{
+      // All error handling will be done later
+      if(err)
+        console.log(err);
+      if(result!=undefined){
+        result.forEach((obj,index) => {
+          var query2="Update Takes set MarksObtained=? where CourseID=? and RollNo=? and ExamID=?";
+          db.query(query2,[marks[index],cid,sid,obj.ExamID],(err,result)=>{
+            // All Error handling will be done later
+            if(err)
+              console.log(err);
+          });
+        });
+        res.json({
+          status: "success",
+          message:"marks sucessfully updated"
+        });
+      }
+    });
+  }
 };
+
+exports.setLock = (req, res) => {
+  if(req.query.examType=="internals") {
+    var query = "update Exams set isLocked = true where ExamId in (select distinct ExamID from Takes WHERE CourseID=?) and ExamName != 'Endterm'"
+    db.query(query,[req.params.cid], (err, results) => {
+      if(err) {
+        console.log(err);
+      }
+      else {
+        res.json({
+          status: "success",
+          data: null,
+          message: "Internal marks locked successfully"
+        });
+      }
+    });
+  }
+  else if(req.query.examType=="endterm") {
+    var query = "update Exams set isLocked = true where ExamId in (select distinct ExamID from Takes WHERE CourseID=?) and ExamName = 'Endterm'"
+    db.query(query,[req.params.cid], (err, results) => {
+      if(err) {
+        console.log(err);
+      }
+      else {
+        res.json({
+          status: "success",
+          data: null,
+          message: "End-Term marks locked successfully"
+        });
+      }
+    });
+  }
+}
+
+exports.getLock = (req, res) => {
+  if(req.query.examType=="internals") {
+    var query = "select isLocked from Exams where ExamId in (select distinct ExamID from Takes WHERE CourseID=?) and ExamName != 'Endterm' limit 1"
+    db.query(query,[req.params.cid], (err, results) => {
+      if(err) {
+        console.log(err);
+      }
+      else {
+        if(results[0].isLocked==false) {
+          res.json({
+            status: "sucess",
+            data: results,
+            message: "Internal Marks are not locked"
+          });
+        }
+        else {
+          res.json({
+            status: "success",
+            data: null,
+            message: "Internal marks are locked"
+          });
+        }
+      }
+    });
+  }
+  else if(req.query.examType=="endterm") {
+    var query = "select isLocked from Exams where ExamId in (select distinct ExamID from Takes WHERE CourseID=?) and ExamName = 'Endterm'"
+    db.query(query,[req.params.cid], (err, results) => {
+      if(err) {
+        console.log(err);
+      }
+      else {
+        if(results[0].isLocked==false) {
+          res.json({
+            status: "sucess",
+            data: results,
+            message: "End-Term Marks are not locked"
+          });
+        }
+        else {
+          res.json({
+            status: "success",
+            data: null,
+            message: "End-Term marks are locked"
+          });
+        }
+      }
+    });
+  }
+}
 
 exports.setOtherCourseGrades = (req, res) => {
   var query = "update Enrolled set grades = ? where RollNo = ? and CourseID = ?"
@@ -312,6 +420,49 @@ exports.getGrades = (req, res) => {
       res.json({
         status: "success",
         data: results[0].grades,
+        message: null
+      })
+    }
+  });
+}
+
+exports.getTotalStudents = (req, res) => {
+  var totalStudents = [0, 0, 0, 0, 0, 0, 0, 0];
+  var query = "Select RollNo, TotalMarks from enrolled where courseId = ?";
+  db.query(query, [req.params.cid], (err, results) => {
+    if(err) {
+      console.log(err);
+    }
+    else {
+      for(let i=0; i<results.length; i++) {
+        if(results[i].TotalMarks>=req.query.Amin&& results[i].TotalMarks<=req.query.Amax) {
+          totalStudents[0]++;
+        }
+        else if(results[i].TotalMarks>=req.query.ABmin&& results[i].TotalMarks<req.query.ABmax) {
+          totalStudents[1]++;
+        }
+        else if(results[i].TotalMarks>=req.query.Bmin&& results[i].TotalMarks<req.query.Bmax) {
+          totalStudents[2]++;
+        }
+        else if(results[i].TotalMarks>=req.query.BCmin&& results[i].TotalMarks<req.query.BCmax) {
+          totalStudents[3]++;
+        }
+        else if(results[i].TotalMarks>=req.query.Cmin&& results[i].TotalMarks<req.query.Cmax) {
+          totalStudents[4]++;
+        }
+        else if(results[i].TotalMarks>=req.query.CDmin&& results[i].TotalMarks<req.query.CDmax) {
+          totalStudents[5]++;
+        }
+        else if(results[i].TotalMarks>=req.query.Dmin&& results[i].TotalMarks<req.query.Dmax) {
+          totalStudents[6]++;
+        }
+        else if(results[i].TotalMarks>=req.query.Fmin&& results[i].TotalMarks<req.query.Fmax) {
+          totalStudents[7]++;
+        }
+      }
+      res.json({
+        status: "success",
+        data: totalStudents,
         message: null
       })
     }
