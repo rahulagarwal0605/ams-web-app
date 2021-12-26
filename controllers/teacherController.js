@@ -42,20 +42,38 @@ exports.viewStudentsList = (req, res) => {
 exports.getMarks = (req, res) => {
   var cid=req.params.cid;
   var sid=req.params.sid;
-  var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=?";
-  db.query(query,[cid,sid],(err,results) => {
-    // All Error handling will be done later
-      if(err){
-        console.log(err);
+  if(req.query=="internals") {
+    var query="SELECT Takes.MarksObtained, Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=? and Exams.ExamName != 'End Term'";
+    db.query(query,[cid,sid],(err,results) => {
+      // All Error handling will be done later
+        if(err){
+          console.log(err);
+        }
+        if(results!=undefined){
+          res.json({
+            status: "success",
+            data:results,
+          });
+        }
       }
-      if(results!=undefined){
-        res.json({
-          status: "success",
-          data:results,
-        });
+    );
+  }
+  else if(req.query=="endterm") {
+    var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=? and Exams.ExamName = 'End Term'";
+    db.query(query,[cid,sid],(err,results) => {
+      // All Error handling will be done later
+        if(err){
+          console.log(err);
+        }
+        if(results!=undefined){
+          res.json({
+            status: "success",
+            data:results,
+          });
+        }
       }
-    }
-  );
+    );
+  }
 };
 
 exports.setMarks = (req, res) => {

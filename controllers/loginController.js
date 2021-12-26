@@ -12,12 +12,12 @@ exports.login = (req, res,next) => {
   	var password = req.body.password;
 	var user;
 	db.query(
-		"SELECT * FROM Login where UserName=?",
+		"SELECT Login.UserName, Login.Password, Login.Type, Instructor.InstructorID FROM Login inner join Instructor on Login.LoginID = Instructor.LoginID where Login.UserName=?",
 		[username],
 		(err, rows) => {
 			if (!err) {
 				if (rows[0] !== undefined) {
-					user = {id:rows[0].LoginID, username:rows[0].UserName, type:rows[0].Type};
+					user = {id:rows[0].InstructorID, username:rows[0].UserName, type:rows[0].Type};
 					bcrypt.compare(password, rows[0].Password, function(err, result) {  // Compare
 						// if passwords match
 						if (result) {
