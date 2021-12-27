@@ -166,7 +166,7 @@ exports.getLock = (req, res) => {
       if(err) {
         console.log(err);
       }
-      else {
+      if(results!=undefined) {
         if(results[0].isLocked==false) {
           res.json({
             status: "sucess",
@@ -190,7 +190,7 @@ exports.getLock = (req, res) => {
       if(err) {
         console.log(err);
       }
-      else {
+      if(results!=undefined) {
         if(results[0].isLocked==false) {
           res.json({
             status: "sucess",
