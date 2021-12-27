@@ -7,6 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
 import Header from "./Header.js";
 import Footer from "./Footer.js";
 import { useLocation, useNavigate, Link } from "react-router-dom";
@@ -17,6 +18,8 @@ import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import Divider from '@mui/material/Divider';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import url from './constants.js';
+import { Switch, Popover } from 'antd';
+import Visual from "./Visual.js"
 
 function MarkEntryEndterm() {
     const [auto_, setAuto_] = React.useState({});
@@ -25,6 +28,8 @@ function MarkEntryEndterm() {
     const [manual, setManual] = React.useState([]);
     const [marks, setMarks] = React.useState([]);
     const [components, setComponents] = React.useState([]);
+    const [lock, setLock] = React.useState(false);
+    const [visual, setVisual] = React.useState(false);
 
     const search = useLocation().search;
     const course = new URLSearchParams(search).get('course');
@@ -37,7 +42,33 @@ function MarkEntryEndterm() {
     React.useEffect(() => {
         if (!authenticated) history("/");
 
-        const getGrades = async (s) => {
+        const checkInternalLock = async () => {
+            let options = {
+                url: `${url}/api/teacher/courses/${id}/getLock?examType=internals`,
+                method: 'GET',
+                withCredentials: true,
+            }
+            let m = await axios(options);
+            if (m.data.message !== "Internal marks are locked") {
+                history(`/InternalNotSet?session=${session}&course=${course}&id=${id}`);
+            }
+
+        }
+
+        const getLock = async () => {
+            let options = {
+                url: `${url}/api/teacher/courses/${id}/getLock?examType=endterm`,
+                method: 'GET',
+                withCredentials: true,
+            }
+            let m = await axios(options);
+            if (m.data.message === "End-Term marks are locked") {
+                setLock(true);
+            }
+
+        }
+
+        const getGradeRanges = async (s) => {
             let options = {
                 url: `${url}/api/teacher/courses/${id}/GetGradeDetails`,
                 method: 'GET',
@@ -113,10 +144,12 @@ function MarkEntryEndterm() {
             }
             setMarks(students);
         }
-
-        getGrades();
+        checkInternalLock();
+        getLock();
         makeCall();
-    }, [id, authenticated, history]);
+        getGradeRanges();
+
+    }, [id, authenticated, history, course, session]);
 
 
 
@@ -134,7 +167,6 @@ function MarkEntryEndterm() {
 
     const sendManual = async () => {
         let temp = manual_;
-        console.log(temp);
         for (const x in temp) {
             let f = document.getElementById(`${x}0`).value;
             let s = document.getElementById(`${x}1`).value;
@@ -153,22 +185,100 @@ function MarkEntryEndterm() {
         setManual_(temp);
     }
 
+    const sendManual_ = async () => {
+        let temp = manual_;
+
+        for (const x in temp) {
+            let f = document.getElementById(`${x}0`).value;
+            let s = document.getElementById(`${x}1`).value;
+
+            if (f) temp[x][0] = f;
+            if (s) temp[x][1] = s;
+        }
+
+        setManual_(temp);
+    }
+
+    const changeLock = async () => {
+        let options = {
+            url: `${url}/api/teacher/courses/${id}/setLock?examType=endterm`,
+            method: 'GET',
+            withCredentials: true,
+        }
+        let m = await axios(options);
+        if (m.data.status === 'success') {
+            message.success("Internal Marks Locked Successfully");
+            setLock(true);
+        }
+    }
+
+    const updateMarks = async (roll) => {
+        const arr = [];
+        for (let i = 0; i < components.length; i++) {
+            let val = document.getElementById(`${roll}${components[i].ExamName}`).value;
+            arr.push(val);
+        }
+        let i = 0;
+        for (i = 0; i < marks.length; i++) {
+            if (marks[i].Roll === roll) {
+                break;
+            }
+        }
+
+        for (let j = 0; j < marks[i].comp.length; j++) {
+            if (!arr[j]) {
+                arr[j] = marks[i].comp[j].MarksObtained;
+            }
+        }
+
+        const options = {
+            url: `${url}/api/teacher/courses/${id}/students/${roll}/setMarks?examType=endterm`,
+            method: 'POST',
+            withCredentials: true,
+            data: {
+                "marks": arr
+            }
+        }
+        let resp = await axios(options);
+        if (resp.data.status === 'success') message.success("Endterm Mark Successfully Updated");
+    }
+
     return (
         <div><Header />
             <div className="mark_entry_endterm">
                 <h4 className="heading">Mark Entry - Endterm</h4>
                 <div className="main">
-                    <div className="select">
-                        <h5>Session:&nbsp; </h5>
-                        <h6 className="fixed">{session}</h6>
+                    <div className="d-flex align-items-around justify-content-between">
+                        <div>
+                            <div className="select">
+                                <h5>Session:&nbsp; </h5>
+                                <h6 className="fixed">{session}</h6>
+                            </div>
+                            <div className="select">
+                                <h5>Course: &nbsp;</h5>
+                                <h6 className="fixed">{course}</h6>
+                            </div>
+                        </div>
+                        <Switch checked={lock} disabled={lock} checkedChildren="Endterm Marks are Locked" unCheckedChildren="Lock Endterm Marks" onChange={() => changeLock()} />
                     </div>
-                    <div className="select">
-                        <h5>Course: &nbsp;</h5>
-                        <h6 className="fixed">{course}</h6>
+                    <div style={{ 'display': lock === true ? 'block' : 'none', 'textAlign': 'center', 'marginBottom': '30px' }} >
+                        <Popover
+                            overlayStyle={{
+                                width: "600px",
+                                height: "600px"
+                            }}
+                            content={<div><Visual auto_={auto_} manual_={manual_} id={id} /><Button onClick={() => setVisual(false)}>Close</Button></div>}
+                            trigger="click"
+                            visible={visual}
+                            onVisibleChange={(e) => { sendManual_(); setVisual(e); }}
+                            placement="bottom"
+                        >
+                            <Button variant="contained" type="primary">Visualise Grade Distribution</Button>
+                        </Popover>
                     </div>
-
                     <div className="table_area">
-                        <div className="table">
+
+                        <div className="table" style={{ 'display': lock === true ? 'block' : 'none' }}>
                             <h5>Automated grade Range</h5>
                             <TableContainer component={Paper} style={{ 'height': '483px' }}>
                                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -189,9 +299,10 @@ function MarkEntryEndterm() {
                             </TableContainer>
                             <button className="submit-btn" onClick={() => sendAuto()}>Use Automated Grade Range</button>
                         </div>
-                        <div className="table">
+
+                        <div className="table" style={{ 'display': lock === true ? 'block' : 'none' }}>
                             <h5>Manual grade Range</h5>
-                            <TableContainer component={Paper} style={{ 'height': '483px' }}>
+                            <TableContainer component={Paper} style={{ 'height': '483px' }} >
                                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                     <TableHead>
                                         <TableRow>
@@ -215,7 +326,7 @@ function MarkEntryEndterm() {
 
                     </div>
 
-                    <h4 style={{ 'marginTop': '20px', 'textAlign': 'center' }}>Locked Marks and Grades</h4>
+                    <h4 style={{ 'marginTop': '20px', 'textAlign': 'center' }}>Endterm Marks and Grades</h4>
                     <Divider variant="fullWidth" />
                     <div className="table">
                         <TableContainer component={Paper} >
@@ -232,7 +343,7 @@ function MarkEntryEndterm() {
                                         }
 
                                         {/* <TableCell style={{ 'fontWeight': 'bold', 'fontFamily': 'Courier New', 'fontSize': '18px' }}>Action</TableCell> */}
-                                        <TableCell style={{ 'fontWeight': 'bold', 'fontFamily': 'Courier New', 'fontSize': '18px' }}>Grade</TableCell>
+                                        <TableCell style={{ 'fontWeight': 'bold', 'fontFamily': 'Courier New', 'fontSize': '18px' }}>{lock === true ? 'Grade' : 'Action'}</TableCell>
 
                                     </TableRow>
                                 </TableHead>
@@ -246,11 +357,13 @@ function MarkEntryEndterm() {
                                                 <TableCell>{s.Name}</TableCell>
                                                 {
                                                     s.comp.map((c) => (
-                                                        <TableCell><input readOnly style={{ 'width': '40px' }} value={c.MarksObtained}></input></TableCell>
+                                                        <TableCell><input id={`${s.Roll}${c.ExamName}`} readOnly={lock} style={{ 'width': '40px' }} placeholder={c.MarksObtained}></input></TableCell>
                                                     ))
                                                 }
-                                                {/* <TableCell><Button variant="outlined" onClick={(e) => updateMarks(s.Roll)}>Save</Button></TableCell> */}
-                                                <TableCell><input readOnly style={{ 'width': '40px' }} value={s.grade}></input></TableCell>
+                                                {
+                                                    lock === true ? <TableCell><input readOnly="true" style={{ 'width': '40px' }} value={s.grade}></input></TableCell> :
+                                                        <TableCell><Button variant="outlined" disabled={lock} onClick={(e) => updateMarks(s.Roll)}>Save</Button></TableCell>
+                                                }
                                             </TableRow>
                                         ))
                                     }
@@ -314,7 +427,7 @@ function MarkEntryEndterm() {
                     </div>
                     <Link to='/MenuInstructor/CourseListEndterm'><KeyboardBackspaceIcon />  Go back to Course Selection</Link>
                 </div>
-            </div>
+            </div >
             <Footer />
         </div >
     )

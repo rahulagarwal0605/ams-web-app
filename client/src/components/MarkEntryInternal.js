@@ -18,6 +18,7 @@ import authContext from "../context/userContext";
 import { message } from 'antd';
 import 'antd/dist/antd.css';
 import url from './constants.js';
+import { Switch } from 'antd';
 
 function MarkEntryInternal() {
 
@@ -26,8 +27,10 @@ function MarkEntryInternal() {
     const session = new URLSearchParams(search).get('session');
     const id = new URLSearchParams(search).get('id');
 
+
     const [marks, setMarks] = React.useState([]);
     const [components, setComponents] = React.useState([]);
+    const [lock, setLock] = React.useState(false);
 
     const { authenticated } = React.useContext(authContext);
     const history = useNavigate();
@@ -46,6 +49,19 @@ function MarkEntryInternal() {
             m = m.data.data;
 
             return { Roll: s.RollNo, Name: s.Name, comp: m };
+        }
+
+        const getLock = async () => {
+            let options = {
+                url: `${url}/api/teacher/courses/${id}/getLock?examType=internals`,
+                method: 'GET',
+                withCredentials: true,
+            }
+            let m = await axios(options);
+            if (m.data.message === "Internal marks are locked") {
+                setLock(true);
+            }
+
         }
 
         const makeCall = async () => {
@@ -69,6 +85,7 @@ function MarkEntryInternal() {
                 setComponents(compo);
             }
             setMarks(students);
+            getLock();
         }
 
         makeCall();
@@ -106,25 +123,38 @@ function MarkEntryInternal() {
         if (resp.data.status === 'success') message.success("Mark Successfully Updated");
     }
 
+    const changeLock = async () => {
+        let options = {
+            url: `${url}/api/teacher/courses/${id}/setLock?examType=internals`,
+            method: 'GET',
+            withCredentials: true,
+        }
+        let m = await axios(options);
+        if (m.data.status === 'success') {
+            message.success("Internal Marks Locked Successfully");
+            setLock(true);
+        }
+    }
+
     return (
         <div>
             <Header />
             <div class="marks_internal">
                 <h4 className="heading">Mark Entry - Internal</h4>
                 <div className="main">
-                    <div className="select">
-                        <h5>Session:&nbsp; </h5>
-                        <h6 className="fixed">{session}</h6>
+                    <div className="d-flex align-items-around justify-content-between">
+                        <div>
+                            <div className="select">
+                                <h5>Session:&nbsp; </h5>
+                                <h6 className="fixed">{session}</h6>
+                            </div>
+                            <div className="select">
+                                <h5>Course: &nbsp;</h5>
+                                <h6 className="fixed">{course}</h6>
+                            </div>
+                        </div>
+                        <Switch checked={lock} disabled={lock} checkedChildren="Internals are Locked" unCheckedChildren="Lock Internals" onChange={() => changeLock()} />
                     </div>
-                    <div className="select">
-                        <h5>Course: &nbsp;</h5>
-                        <h6 className="fixed">{course}</h6>
-                    </div>
-                    {/* <div className="select">
-                        <h5>Import Student Marks: &nbsp;</h5>
-                        <input type="file" id="myfile" name="myfile"></input>
-                    </div>
-                    */}
 
                     <div className="table">
                         <TableContainer component={Paper} >
@@ -154,10 +184,10 @@ function MarkEntryInternal() {
                                                 <TableCell>{s.Name}</TableCell>
                                                 {
                                                     s.comp.map((c) => (
-                                                        <TableCell><input id={`${s.Roll}${c.ExamName}`} style={{ 'width': '40px' }} placeholder={c.MarksObtained}></input></TableCell>
+                                                        <TableCell><input id={`${s.Roll}${c.ExamName}`} style={{ 'width': '40px' }} placeholder={c.MarksObtained} readOnly={lock}></input></TableCell>
                                                     ))
                                                 }
-                                                <TableCell><Button variant="outlined" onClick={(e) => updateMarks(s.Roll)}>Save</Button></TableCell>
+                                                <TableCell><Button variant="outlined" disabled={lock} onClick={(e) => updateMarks(s.Roll)}>Save</Button></TableCell>
                                             </TableRow>
                                         ))
                                     }
@@ -203,6 +233,7 @@ function MarkEntryInternal() {
                             </table>
                         </TableContainer>
                     </div>
+
                     <div className="select">
                         <h5>Export Student List:&nbsp;&nbsp;&nbsp;</h5>
                         <button onClick={() => {
@@ -218,6 +249,9 @@ function MarkEntryInternal() {
                         </button>
                     </div>
                     <Link to='/MenuInstructor/CourseListInternal'><KeyboardBackspaceIcon />  Go back to Course Selection</Link>
+
+
+
                 </div>
             </div>
             <Footer />

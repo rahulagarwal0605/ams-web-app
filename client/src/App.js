@@ -7,9 +7,11 @@ import EvaluationScheme from "./components/EvaluationScheme.js";
 import MarkEntryInternal from "./components/MarkEntryInternal.js";
 import MarkEntryEndterm from "./components/MarkEntryEndterm.js";
 import SuccessLogin from "./components/SuccessLogin.js";
+import InternalNotSet from "./components/InternalNotSet.js";
 import { Route, Routes } from "react-router-dom"
 import Btp from "./components/Btp";
 import authContext from "./context/userContext";
+
 
 function App() {
   const [authenticated, setAuthenticated] = React.useState(false);
@@ -28,7 +30,7 @@ function App() {
           <Route path="/MenuInstructor/CourseListEndterm/MarkEntryEndterm" element={<MarkEntryEndterm />} />
           <Route path="/MenuInstructor/CourseListBtp" element={<CourseList page="BTP" list="BTP" />} />
           <Route path="/MenuInstructor/CourseListBtp/Btp" element={<Btp />} />
-
+          <Route path="/InternalNotSet" element={<InternalNotSet />} />
         </Routes>
 
       </div>
