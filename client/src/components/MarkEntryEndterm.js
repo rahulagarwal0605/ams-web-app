@@ -18,8 +18,20 @@ import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import Divider from '@mui/material/Divider';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import url from './constants.js';
-import { Switch, Popover } from 'antd';
-import Visual from "./Visual.js"
+import { Switch } from 'antd';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
 
 function MarkEntryEndterm() {
     const [auto_, setAuto_] = React.useState({});
@@ -38,6 +50,53 @@ function MarkEntryEndterm() {
 
     const { authenticated } = React.useContext(authContext);
     const history = useNavigate();
+
+    ChartJS.register(
+        CategoryScale,
+        LinearScale,
+        PointElement,
+        LineElement,
+        Title,
+        Tooltip,
+        Legend
+    );
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Grade vs #students',
+            },
+        },
+    };
+
+
+    const labels = ['A', 'AB', 'B', 'BC', 'C', 'CD', 'D', 'F'];
+    const [data1, setData1] = React.useState({ 'A': null, 'AB': null, 'B': null, 'BC': null, 'C': null, 'CD': null, 'D': null, 'F': null });
+    const [data2, setData2] = React.useState({ 'A': null, 'AB': null, 'B': null, 'BC': null, 'C': null, 'CD': null, 'D': null, 'F': null });
+
+    const data = {
+        labels,
+        datasets: [
+            {
+                label: 'Automatic Grade',
+                data: data1,
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            },
+            {
+                label: 'Manual Grade',
+                data: data2,
+                borderColor: 'rgb(53, 162, 235)',
+                backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            },
+        ],
+    };
+
 
     React.useEffect(() => {
         if (!authenticated) history("/");
@@ -76,8 +135,9 @@ function MarkEntryEndterm() {
             }
             let m = await axios(options);
             m = m.data.data;
+            console.log(m);
             setAuto_(m);
-            setManual_(m);
+            await setManual_(m);
             let gradePoints = 10;
             let temp = [];
             for (const x in m) {
@@ -101,6 +161,7 @@ function MarkEntryEndterm() {
                 </TableRow>)
             }
             setManual(temp);
+
         }
 
         const getMarksandGrades = async (s) => {
@@ -144,10 +205,12 @@ function MarkEntryEndterm() {
             }
             setMarks(students);
         }
+
         checkInternalLock();
         getLock();
         makeCall();
         getGradeRanges();
+
 
     }, [id, authenticated, history, course, session]);
 
@@ -171,8 +234,8 @@ function MarkEntryEndterm() {
             let f = document.getElementById(`${x}0`).value;
             let s = document.getElementById(`${x}1`).value;
 
-            if (f) temp[x][0] = f;
-            if (s) temp[x][1] = s;
+            if (f) temp[x][0] = parseInt(f);
+            if (s) temp[x][1] = parseInt(s);
         }
         let options = {
             url: `${url}/api/teacher/courses/${id}/SetGrades`,
@@ -182,20 +245,6 @@ function MarkEntryEndterm() {
         }
         let m = await axios(options);
         if (m.data.status === 'success') message.success("Manual Grade Range will be used!")
-        setManual_(temp);
-    }
-
-    const sendManual_ = async () => {
-        let temp = manual_;
-
-        for (const x in temp) {
-            let f = document.getElementById(`${x}0`).value;
-            let s = document.getElementById(`${x}1`).value;
-
-            if (f) temp[x][0] = f;
-            if (s) temp[x][1] = s;
-        }
-
         setManual_(temp);
     }
 
@@ -243,6 +292,45 @@ function MarkEntryEndterm() {
         if (resp.data.status === 'success') message.success("Endterm Mark Successfully Updated");
     }
 
+    const getVisual = async () => {
+
+        let options = {
+            url: `${url}/api/teacher/courses/${id}/getTotalStudents`,
+            method: 'POST',
+            withCredentials: true
+        }
+        let temp = { 'A': null, 'AB': null, 'B': null, 'BC': null, 'C': null, 'CD': null, 'D': null, 'F': null };
+
+        if (data1.A === null) {
+            let m = await axios({ ...options, data: auto_ });
+            for (let i = 0; i < labels.length; i++) {
+                temp[labels[i]] = m.data.data[i]
+            }
+            setData1(temp);
+            m = await axios({ ...options, data: manual_ });
+            for (let i = 0; i < labels.length; i++) {
+                temp[labels[i]] = m.data.data[i]
+            }
+            setData2(temp);
+        }
+        else {
+            let temp_ = { ...manual_ };
+            for (const x in temp) {
+                let f = document.getElementById(`${x}0`).value;
+                let s = document.getElementById(`${x}1`).value;
+
+                if (f) temp_[x][0] = parseInt(f);
+                if (s) temp_[x][1] = parseInt(s);
+            }
+
+            let m = await axios({ ...options, data: temp_ });
+            for (let i = 0; i < labels.length; i++) {
+                temp[labels[i]] = m.data.data[i]
+            }
+            setData2(temp);
+        }
+    }
+
     return (
         <div><Header />
             <div className="mark_entry_endterm">
@@ -262,19 +350,13 @@ function MarkEntryEndterm() {
                         <Switch checked={lock} disabled={lock} checkedChildren="Endterm Marks are Locked" unCheckedChildren="Lock Endterm Marks" onChange={() => changeLock()} />
                     </div>
                     <div style={{ 'display': lock === true ? 'block' : 'none', 'textAlign': 'center', 'marginBottom': '30px' }} >
-                        <Popover
-                            overlayStyle={{
-                                width: "600px",
-                                height: "600px"
-                            }}
-                            content={<div><Visual auto_={auto_} manual_={manual_} id={id} /><Button onClick={() => setVisual(false)}>Close</Button></div>}
-                            trigger="click"
-                            visible={visual}
-                            onVisibleChange={(e) => { sendManual_(); setVisual(e); }}
-                            placement="bottom"
-                        >
-                            <Button variant="contained" type="primary">Visualise Grade Distribution</Button>
-                        </Popover>
+
+                        <Button variant="contained" type="primary" onClick={() => { getVisual(); setVisual(true) }}>Visualise Grade Distribution</Button>
+                        <IconButton onClick={() => setVisual(false)} disabled={!visual}>
+                            <CloseIcon />
+                        </IconButton>
+                        <div style={{ 'display': visual === true ? 'block' : 'none', width: '650px', marginLeft: '290px' }}><Line options={options} data={data} /></div>
+
                     </div>
                     <div className="table_area">
 
@@ -320,7 +402,7 @@ function MarkEntryEndterm() {
                                 </Table>
                             </TableContainer>
 
-                            <button className="submit-btn" onClick={() => sendManual()}>Use Manual Grade Range</button>
+                            <button className="submit-btn" onClick={() => { sendManual(); getVisual(); }}>Use Manual Grade Range</button>
 
                         </div>
 
