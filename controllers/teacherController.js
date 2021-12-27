@@ -166,7 +166,7 @@ exports.getLock = (req, res) => {
       if(err) {
         console.log(err);
       }
-      if(results!=undefined) {
+      if(results[0]!=undefined) {
         if(results[0].isLocked==false) {
           res.json({
             status: "sucess",
@@ -182,6 +182,13 @@ exports.getLock = (req, res) => {
           });
         }
       }
+      else {
+        res.json({
+          status: "success",
+          data: null,
+          message: "Internal components are not set"
+        });
+      }
     });
   }
   else if(req.query.examType=="endterm") {
@@ -190,7 +197,7 @@ exports.getLock = (req, res) => {
       if(err) {
         console.log(err);
       }
-      if(results!=undefined) {
+      if(results[0]!=undefined) {
         if(results[0].isLocked==false) {
           res.json({
             status: "sucess",
@@ -205,6 +212,13 @@ exports.getLock = (req, res) => {
             message: "End-Term marks are locked"
           });
         }
+      }
+      else {
+        res.json({
+          status: "success",
+          data: null,
+          message: "End-Term component is not set"
+        });
       }
     });
   }
