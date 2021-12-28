@@ -68,7 +68,7 @@ function Btp() {
             url: `${url}/api/teacher/courses/${id}/students/${roll}/setGrade`,
             method: 'POST',
             withCredentials: true,
-            body: {
+            data: {
                 'grade': document.getElementById(`${roll}`).value,
             }
         }
