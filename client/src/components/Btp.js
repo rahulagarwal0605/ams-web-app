@@ -64,7 +64,17 @@ function Btp() {
     }, [authenticated, history, id])
 
     const updateGrades = async (roll) => {
-        message.success("Grade Successfuly Updated!")
+        let options = {
+            url: `${url}/api/teacher/courses/${id}/students/${roll}/setGrade`,
+            method: 'GET',
+            withCredentials: true,
+            body: {
+                'grade': document.getElementById(`${roll}`).value,
+            }
+        }
+        let m = await axios(options);
+        if (m.data.status === 'success')
+            message.success("Grade Successfuly Updated!")
     }
 
     return (
@@ -101,7 +111,7 @@ function Btp() {
                                             >
                                                 <TableCell>{s.roll}</TableCell>
                                                 <TableCell>{s.name}</TableCell>
-                                                <TableCell><input style={{ 'width': '40px' }} placeholder={s.grade}></input></TableCell>
+                                                <TableCell><input style={{ 'width': '40px' }} id={`${s.roll}`} placeholder={s.grade}></input></TableCell>
                                                 <TableCell><Button variant="outlined" onClick={(e) => updateGrades(s.roll)}>Save</Button></TableCell>
                                             </TableRow>
                                         ))

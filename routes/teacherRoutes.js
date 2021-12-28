@@ -17,6 +17,7 @@ router.get("/courses/:cid/getLock", isAuthenticated, teacherController.getLock);
 router.post("/courses/:cid/getTotalStudents", isAuthenticated, teacherController.getTotalStudents);
 router.post("/courses/:cid/students/:sid/setMarks", isAuthenticated, teacherController.setMarks);
 router.get("/courses/:cid/students/:sid/getGrades", isAuthenticated, teacherController.getGrades);
+router.post("/courses/:cid/students/:sid/setGrade", isAuthenticated, teacherController.setGrade);
 router.post("/courses/:cid/SetGrades", teacherController.setGrades);
 router.post("/courses/:cid/SetOtherCourseGrades/:sid", teacherController.setOtherCourseGrades);
 
