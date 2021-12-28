@@ -66,7 +66,7 @@ function Btp() {
     const updateGrades = async (roll) => {
         let options = {
             url: `${url}/api/teacher/courses/${id}/students/${roll}/setGrade`,
-            method: 'GET',
+            method: 'POST',
             withCredentials: true,
             body: {
                 'grade': document.getElementById(`${roll}`).value,

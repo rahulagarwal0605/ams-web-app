@@ -486,7 +486,7 @@ exports.getTotalStudents = (req, res) => {
 }
 
 exports.setGrade = (req, res) => {
-    query = "update Enrolled set Grades = ? where RollNo = ? and courseID = ?"
+    query = "update Enrolled set Grades = ? where RollNo = ? and courseID = ?";
     db.query(query, [req.body.grade, req.params.sid, req.params.cid], (err,results) => {
       if(err) {
         console.log(err);
