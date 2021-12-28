@@ -1,4 +1,3 @@
-//jshint esversion:8
 require("dotenv").config();
 const e = require("express");
 const math = require('mathjs');
@@ -8,7 +7,6 @@ const db = require('../config/db');
 exports.viewCoursesList = (req, res) => {
     var query="SELECT Course.CourseId, Course.CourseName, CourseInstructor.Session FROM Course inner join CourseInstructor on CourseInstructor.CourseId=Course.CourseId WHERE CourseInstructor.InstructorID =? and CourseType = ?";
     db.query(query,[req.userId, req.query.courseType],(err,results) => {
-        // All Error handling will be done later
         if(err){
             console.log(err);
         }
@@ -25,7 +23,6 @@ exports.viewCoursesList = (req, res) => {
 exports.viewStudentsList = (req, res) => {
     var query="SELECT Student.RollNo, Student.Name FROM Enrolled inner join Student on Enrolled.RollNo=Student.RollNo WHERE Enrolled.CourseID =?";
     db.query(query,[req.params.cid],(err,results) => {
-        // All Error handling will be done later
         if(err){
             console.log(err);
         }
@@ -45,7 +42,6 @@ exports.getMarks = (req, res) => {
   if(req.query.examType=="internals") {
     var query="SELECT Takes.MarksObtained, Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=? and Exams.ExamName != 'Endterm'";
     db.query(query,[cid,sid],(err,results) => {
-      // All Error handling will be done later
         if(err){
           console.log(err);
         }
@@ -61,7 +57,6 @@ exports.getMarks = (req, res) => {
   else if(req.query.examType=="endterm") {
     var query="SELECT Takes.MarksObtained,Exams.ExamName FROM Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =? and Takes.RollNo=? and Exams.ExamName = 'Endterm'";
     db.query(query,[cid,sid],(err,results) => {
-      // All Error handling will be done later
         if(err){
           console.log(err);
         }
@@ -83,14 +78,12 @@ exports.setMarks = (req, res) => {
   if(req.query.examType=="internals") {
     var query1 = "Select Exams.ExamID, Exams.ExamName from Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID=? and Takes.RollNo=? and ExamName!='Endterm'";
     db.query(query1,[cid,sid],(err,result)=>{
-      // All error handling will be done later
       if(err)
         console.log(err);
       if(result!=undefined){
         result.forEach((obj,index) => {
           var query2="Update Takes set MarksObtained=? where CourseID=? and RollNo=? and ExamID=?";
           db.query(query2,[marks[index],cid,sid,obj.ExamID],(err,result)=>{
-            // All Error handling will be done later
             if(err)
               console.log(err);
           });
@@ -105,14 +98,12 @@ exports.setMarks = (req, res) => {
   if(req.query.examType=="endterm") {
     var query1 = "Select Exams.ExamID, Exams.ExamName from Takes inner join Exams on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID=? and Takes.RollNo=? and ExamName='Endterm'";
     db.query(query1,[cid,sid],(err,result)=>{
-      // All error handling will be done later
       if(err)
         console.log(err);
       if(result!=undefined){
         result.forEach((obj,index) => {
           var query2="Update Takes set MarksObtained=? where CourseID=? and RollNo=? and ExamID=?";
           db.query(query2,[marks[index],cid,sid,obj.ExamID],(err,result)=>{
-            // All Error handling will be done later
             if(err)
               console.log(err);
           });
@@ -227,7 +218,6 @@ exports.getLock = (req, res) => {
 exports.getEvaluationScheme = (req, res) => {
     var query="SELECT DISTINCT Exams.ExamId, Exams.ExamName, Exams.ExamDate, Exams.TotalMarks, Exams.Weightage  FROM Exams inner join Takes on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =?";
     db.query(query,[req.params.cid],(err,results) => {
-      // All Error handling will be done later
         if(err){
           console.log(err);
         }
@@ -244,7 +234,6 @@ exports.getEvaluationScheme = (req, res) => {
 function setExam(ExamName, MaximumMarks, Weightage, cid, res, callback) {
   var query="Insert into Exams(ExamName, TotalMarks, Weightage) values (?, ?, ?); Select ExamId from Exams order by ExamId desc limit 1";
     db.query(query,[ExamName, MaximumMarks, Weightage],(err,results) => {
-      // All Error handling will be done later
         if(err){
           console.log(err);
         }
@@ -258,7 +247,6 @@ function setExam(ExamName, MaximumMarks, Weightage, cid, res, callback) {
 function getStudentList(examId, cid, res, callback) {
   var query="SELECT Student.RollNo FROM Enrolled inner join Student on Enrolled.RollNo=Student.RollNo WHERE Enrolled.CourseID =?";
     db.query(query,[cid],(err,results) => {
-        // All Error handling will be done later
         if(err){
             console.log(err);
         }
@@ -276,7 +264,6 @@ function setTakes(examId, cid, res, results) {
   }
   var query="Insert into Takes(CourseId, ExamId, RollNo, MarksObtained) values ?";
     db.query(query,[takes],(err,results) => {
-      // All Error handling will be done later
         if(err){
             console.log(err);
             res.json({
@@ -303,7 +290,6 @@ exports.setEvaluationSceheme = (req, res) => {
 exports.editEvaluationSceheme = (req, res) => {
   var query="update Exams set ExamName = ?, TotalMarks = ?, Weightage = ? WHERE ExamId =?";
     db.query(query,[req.body.ExamName, req.body.MaximumMarks, req.body.Weightage, req.body.ExamID],(err,results) => {
-        // All Error handling will be done later
         if(err){
             console.log(err);
         }
@@ -321,14 +307,12 @@ exports.editEvaluationSceheme = (req, res) => {
 exports.deleteEvaluationSceheme = (req, res) => {
   var query="delete from Takes where ExamId = ?";
     db.query(query,[req.body.ExamId],(err,results) => {
-        // All Error handling will be done later
         if(err){
             console.log(err);
         }
         else {
           query="delete from Exams where ExamId = ?";
           db.query(query,[req.body.ExamId],(err,results) => {
-              // All Error handling will be done later
               if(err){
                   console.log(err);
               }
@@ -349,12 +333,10 @@ exports.deleteEvaluationSceheme = (req, res) => {
 exports.getGradeDetails = (req, res) => {
   var query="Select Distinct RollNo from takes where courseID = ?";
   db.query(query, req.params.cid, (err,results1) => {
-    // All Error handling will be done later
     if(err){
       console.log(err);
     }
     else {
-      // console.log(results1);
       let studentMarks = [];
       let counter = 0;
       for(let i=0; i<results1.length; i++) {
@@ -364,7 +346,6 @@ exports.getGradeDetails = (req, res) => {
             console.log(err);
           }
           else {
-            // console.log(results2);
             query = "update Enrolled set totalMarks = ? where RollNo = ? and CourseID = ?"
             db.query(query, [results2[0].MarksObtained, results1[i].RollNo, req.params.cid], (err,results3) => {
               if(err) {
@@ -390,7 +371,6 @@ function returnGradeDetails(res,studentMarks){
   let avg = math.mean(studentMarks);
 
   let std = math.std(studentMarks);
-  // console.log(avg, std, studentMarks);
 
   let gradeDetails = {
 
@@ -488,7 +468,6 @@ exports.setGrade = (req, res) => {
 exports.setGrades = (req, res) => {
   var query="Select RollNo, TotalMarks from enrolled where courseID = ?";
   db.query(query, req.params.cid, (err,results1) => {
-    // All Error handling will be done later
     if(err){
       console.log(err);
     }

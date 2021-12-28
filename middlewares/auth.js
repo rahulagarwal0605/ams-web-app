@@ -1,13 +1,9 @@
-//jshint esversion:9
 require("dotenv").config();
-
 
 const jwt = require('jsonwebtoken');
 
 function isAuthenticated(req,res,next){
   const { token } = req.cookies;
-  // if not token then send error
-
   const decoded = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
   req.userId=decoded.id;
   next();

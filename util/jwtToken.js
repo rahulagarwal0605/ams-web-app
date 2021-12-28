@@ -1,6 +1,4 @@
-// jshint esversion:6
 require("dotenv").config();
-
 
 const jwt = require('jsonwebtoken');
 function sendToken(user,res){

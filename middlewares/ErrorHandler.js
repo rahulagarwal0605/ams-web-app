@@ -1,7 +1,4 @@
-//jshint esversion:6
 require("dotenv").config();
-
-
 
 const ApiError=require('../util/ApiError');
 
@@ -29,8 +26,7 @@ function apiErrorHandler(err,req,res,next){
         const message = 'JSON Web Token is invalid. Try Again!!!';
         error = new ApiError(message, 400);
     }
-
-       // Handling Expired JWT error
+    
     if (err.name === 'TokenExpiredError') {
         const message = 'JSON Web Token is expired. Try Again!!!';
         error = new ApiError(message, 400);

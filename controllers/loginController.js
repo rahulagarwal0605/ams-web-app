@@ -1,5 +1,3 @@
-// jshint esversion:9
-
 require("dotenv").config();
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
@@ -18,20 +16,16 @@ exports.login = (req, res,next) => {
 			if (!err) {
 				if (rows[0] !== undefined) {
 					user = {id:rows[0].InstructorID, username:rows[0].UserName, type:rows[0].Type};
-					bcrypt.compare(password, rows[0].Password, function(err, result) {  // Compare
-						// if passwords match
+					bcrypt.compare(password, rows[0].Password, function(err, result) {
 						if (result) {
 							sendToken(user,res);
 						}
-						// if passwords do not match
 						else {
 							res.json({status: "error", data: null, message: "Invalid user details"});
-              //return next(new ApiError("Invalid user details",401));
 						}
 					  });
 				} else {
 					res.json({status: "error", data: null, message: "Invalid user details"});
-          //return next(new ApiError("Invalid user details",401));
 				}
 			} else {
 				console.log(err);
