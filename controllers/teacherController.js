@@ -224,22 +224,6 @@ exports.getLock = (req, res) => {
   }
 }
 
-exports.setOtherCourseGrades = (req, res) => {
-  var query = "update Enrolled set grades = ? where RollNo = ? and CourseID = ?"
-  db.query(query,[req.body.grade, req.params.sid, req.params.cid], (err, results) => {
-    if(err) {
-      console.log(err);
-    }
-    else {
-      res.json({
-        status: "success",
-        data: null,
-        message: "Grade successfully updated"
-      });
-    }
-  });
-};
-
 exports.getEvaluationScheme = (req, res) => {
     var query="SELECT DISTINCT Exams.ExamId, Exams.ExamName, Exams.ExamDate, Exams.TotalMarks, Exams.Weightage  FROM Exams inner join Takes on Takes.ExamID=Exams.ExamID WHERE Takes.CourseID =?";
     db.query(query,[req.params.cid],(err,results) => {
@@ -486,7 +470,7 @@ exports.getTotalStudents = (req, res) => {
 }
 
 exports.setGrade = (req, res) => {
-    query = "update Enrolled set Grades = ? where RollNo = ? and courseID = ?";
+    var query = "update Enrolled set Grades = ? where RollNo = ? and courseID = ?";
     db.query(query, [req.body.grade, req.params.sid, req.params.cid], (err,results) => {
       if(err) {
         console.log(err);
